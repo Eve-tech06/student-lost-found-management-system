@@ -18,10 +18,3 @@ Route::middleware('auth')
         Route::get('/{item}/edit', [FoundItemController::class, 'edit'])->name('edit');
         Route::put('/{item}', [FoundItemController::class, 'update'])->name('update');
     });
-
-// ===== TEMPORARY: DELETE BEFORE COMMITTING =====
-Route::get('/dev-login/{id?}', function ($id = 1) {
-    \Illuminate\Support\Facades\Auth::loginUsingId($id);
-    return redirect('/found-items');
-})->name('login');
-// ===============================================
