@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\LostItemController;
@@ -12,6 +14,32 @@ use App\Http\Controllers\SearchController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Authentication Routes
+
+// Registration
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+
+Route::post('/register', [AuthController::class, 'register']);
+
+// Login
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::post('/login', [AuthController::class, 'login']);
+
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
+// User Dashboard
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 // Lost Items Routes
 Route::middleware('auth')
@@ -47,6 +75,7 @@ Route::get('/items/{id}', [SearchController::class, 'show'])->name('items.show')
 
 // Claims Management Routes
 Route::middleware('auth')->group(function () {
+
     Route::get('/items/{itemId}/claim', [ClaimController::class, 'create'])
         ->name('claims.create');
 
