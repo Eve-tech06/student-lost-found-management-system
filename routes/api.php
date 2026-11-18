@@ -1,10 +1,12 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Api\FoundItemApiController;
 use App\Http\Controllers\Api\LostItemApiController;
 use App\Http\Controllers\Api\SearchApiController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ClaimApiController;
 
 // Authenticated user information
 Route::get('/user', function (Request $request) {
@@ -36,3 +38,26 @@ Route::get('/items', [SearchApiController::class, 'index']);
 Route::get('/items/search', [SearchApiController::class, 'search']);
 Route::get('/items/filter', [SearchApiController::class, 'filter']);
 Route::get('/items/{id}', [SearchApiController::class, 'show']);
+
+// Claims Management API Routes
+Route::middleware('auth:sanctum')->group(function () {
+
+    // Submit a claim
+    Route::post(
+        '/items/{itemId}/claim',
+        [ClaimApiController::class, 'store']
+    )->name('api.claims.store');
+
+    // View the logged-in user's claims
+    Route::get(
+        '/my-claims',
+        [ClaimApiController::class, 'index']
+    )->name('api.claims.index');
+
+    // View one of the logged-in user's claims
+    Route::get(
+        '/my-claims/{claimId}',
+        [ClaimApiController::class, 'show']
+    )->name('api.claims.show');
+
+});
