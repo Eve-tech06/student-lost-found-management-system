@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\FoundItemApiController;
 use App\Http\Controllers\Api\LostItemApiController;
 use App\Http\Controllers\Api\SearchApiController;
@@ -42,22 +43,40 @@ Route::get('/items/{id}', [SearchApiController::class, 'show']);
 // Claims Management API Routes
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Submit a claim
-    Route::post(
-        '/items/{itemId}/claim',
-        [ClaimApiController::class, 'store']
-    )->name('api.claims.store');
+    Route::post('/items/{itemId}/claim', [ClaimApiController::class, 'store'])
+        ->name('api.claims.store');
 
-    // View the logged-in user's claims
-    Route::get(
-        '/my-claims',
-        [ClaimApiController::class, 'index']
-    )->name('api.claims.index');
+    Route::get('/my-claims', [ClaimApiController::class, 'index'])
+        ->name('api.claims.index');
 
-    // View one of the logged-in user's claims
-    Route::get(
-        '/my-claims/{claimId}',
-        [ClaimApiController::class, 'show']
-    )->name('api.claims.show');
+    Route::get('/my-claims/{claimId}', [ClaimApiController::class, 'show'])
+        ->name('api.claims.show');
 
 });
+
+// Administration API Routes
+Route::middleware(['auth:sanctum', 'admin'])
+    ->prefix('admin')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [AdminApiController::class, 'dashboard']);
+
+        // User management
+        Route::get('/users', [AdminApiController::class, 'users']);
+        Route::patch('/users/{id}/role', [AdminApiController::class, 'updateUserRole']);
+
+        // Item management
+        Route::get('/items', [AdminApiController::class, 'items']);
+        Route::get('/items/{id}', [AdminApiController::class, 'showItem']);
+        Route::patch('/items/{id}/status', [AdminApiController::class, 'updateItemStatus']);
+
+        // Claim management
+        Route::get('/claims', [AdminApiController::class, 'claims']);
+        Route::get('/claims/{id}', [AdminApiController::class, 'claimDetails']);
+        Route::patch('/claims/{id}/approve', [AdminApiController::class, 'approveClaim']);
+        Route::patch('/claims/{id}/reject', [AdminApiController::class, 'rejectClaim']);
+
+        // Reports
+        Route::get('/reports', [AdminApiController::class, 'reports']);
+    });
